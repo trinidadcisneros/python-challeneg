@@ -22,6 +22,7 @@
 # * In addition, your final script should both print the analysis to the terminal and export a text file with the results.
 
 import pandas as pd
+import numpy as np
 
 pybank = pd.read_csv("PyBank.csv", header = 'infer', parse_dates=False)
 
@@ -32,34 +33,42 @@ total_months = pybank['Date'].count()
 print(f"Total Months: {total_months}")
 total_amount = pybank['Profit/Losses'].sum()
 print(f"Total: ${total_amount}")
-average_change = round(pybank['Profit/Losses'].mean(), 2)
-print(f"Average Change: ${average_change}")
+# average_change = round(pybank['Profit/Losses'].mean(), 2)
+# print(f"Average Change: ${average_change}")
 
 # This block of code converts the Date column into the index
 pybank.index = pybank['Date']
-pybank2 = pybank[['Profit/Losses']]
-
+pybank2 = (pybank['Profit/Losses'].astype(int))
+pybank2_index = (pybank['Date'])
 
 # Extracts the profit/loss column into a series and assigns it to the following variable
-profit_losses_series = pybank2['Profit/Losses']
+# Create a list that will hold the change values
+profit_losses_series = []
+profit_losses_index = []
+i = 1
+for i in range(len(pybank2)-1):
+    first_val = pybank2[i]
+    second_val = pybank2[i + 1]
+    index_val2 = pybank2_index[i + 1]
+    change_value = second_val - first_val
+    profit_losses_series.append(change_value)
+    profit_losses_index.append(index_val2)
 
-# The following block will determine the date with the greatest profit
-# Determines which value in the profit/loss series has the highest value
-max_profit = profit_losses_series.max()
-# Determines the index (the date) of the max profit and assigns the value to the profit date variable
-profit_date = str(profit_losses_series.index[profit_losses_series == max_profit].values)
-# Since the output of profit date is a string in a list, the following 
-# removes the brakets and quotation mark so that the date can be printed without these characters
-formatted_profit_date = str(profit_date)[2:-2]
-print(f"Greatest Increase in Profits: {formatted_profit_date} $({max_profit})")
+# Calculate the average change in the list using numpy mean and then rouding to 2 decimals
+average_change = round(np.mean(profit_losses_series),2)
+print(f"Average  Change: ${average_change}")
 
-# The following block will determine the date with the lowest profts
-decreased_profit = profit_losses_series.min()
-# Determines the index (the date) with the greatest loss of profit and assigns 
-# the value to the profit decreased_profit_date variable
-decreased_profit_date = str(profit_losses_series.index[profit_losses_series == decreased_profit].values)
-# Formats date of decreased profit value so that the braket and quotation is not in the output
-formatted_decreased_profit_date = str(decreased_profit_date)[2:-2]
-print(f"Greatest Decrease in Profits: {formatted_decreased_profit_date} $({decreased_profit})")
+# Determines the date that had the highest change in profit that is stored in the series
+max_change_in_profit = max(profit_losses_series)
+# Determine the corresponding index (date) that had the highest change in profit
+max_change_index = profit_losses_series.index(max_change_in_profit)
+maxDate = profit_losses_index[max_change_index]
+print(f"Greatest Increase in Profits: {maxDate} (${max_change_in_profit})")
+
+# Determine the date that had the greatest loss of profit stored in the profit loss series
+min_change_in_profit = min(profit_losses_series)
+min_change_index = profit_losses_series.index(min_change_in_profit)
+minDate = profit_losses_index[min_change_index]
+print(f"Greatest Decrease in Profits: {minDate} (${min_change_in_profit})")
 
 pybank.to_csv('pybank_result.txt', header = None, sep = ' ', mode = 'a')

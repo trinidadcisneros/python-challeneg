@@ -26,9 +26,6 @@
 # In addition, your final script should both print the analysis to the terminal and export a text file with the results.
 
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-
 
 df = pd.read_csv("PyPoll.csv", header = 'infer')
 # print(df.columns)
@@ -39,6 +36,7 @@ print("-------------------------")
 total_votes = df['Voter ID'].count()
 print(f"Total Votes: {total_votes}")
 print("-------------------------")
+
 # print the percent of voters to the candidate khan
 khan_candidate_as_true = df['Candidate'] == 'Khan'
 # Create a df with only Khan
@@ -81,3 +79,5 @@ popular_vote_dict = {"Khan" : khan_votes, "Correy" : Correy_votes, "Li" : Li_vot
 max_key = max(popular_vote_dict, key = lambda k: popular_vote_dict[k])
 print(f"Winner: {max_key}")
 print("-------------------------")
+
+df.to_csv('pypoll_result.txt', header = None, sep = ' ', mode = 'a')
